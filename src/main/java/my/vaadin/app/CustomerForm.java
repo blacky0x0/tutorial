@@ -2,6 +2,7 @@ package my.vaadin.app;
 
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.event.ShortcutAction.KeyCode;
+import com.vaadin.ui.*;
 
 public class CustomerForm extends CustomerFormDesign {
 
@@ -28,9 +29,37 @@ public class CustomerForm extends CustomerFormDesign {
 	}
 
 	private void delete() {
-		service.delete(customer);
-		myUI.updateList();
-		setVisible(false);
+		// Create a sub-window and set the content
+		final Window modal = new Window("Continue?");
+		final HorizontalLayout content = new HorizontalLayout();
+		final Button ok = new Button("OK");
+		final Button cancel = new Button("Cancel");
+
+		ok.addClickListener(event -> {
+			service.delete(customer);
+			myUI.updateList();
+			setVisible(false);
+
+			modal.close();
+		});
+		cancel.addClickListener(event -> {
+			modal.close();
+		});
+
+		// Set components
+		modal.setContent(content);
+		content.addComponent(ok);
+		content.addComponent(cancel);
+		content.setSizeUndefined();
+		content.setMargin(true);
+		content.setSpacing(true);
+
+		// Center it in the browser window
+		modal.center();
+		modal.setVisible(true);
+		modal.setModal(true);
+
+		myUI.addWindow(modal);
 	}
 
 	private void save() {
